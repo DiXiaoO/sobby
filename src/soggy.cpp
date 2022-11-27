@@ -1596,10 +1596,18 @@ void cmd_pos(YSConnection *target, std::string label, std::vector<std::string> a
 	soggy_log("rot x=%.3f y=%.3f z=%.3f", target->player->current_rot.x, target->player->current_rot.y, target->player->current_rot.z);
 }
 
-void cmd_spawn(YSConnection *target, std::string label, std::string argline) {
-	std::string arg = arg_take<std::string>(&argline);
+void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string> args) {
+	int spawn_id;
+	
 	try {
-		const exceloutput::NpcData *excel_npc = &exceloutput::npc_datas.at(atoi(arg.c_str()));
+		parse_args(args, &spawn_id);
+	} catch (std::exception &) {
+		soggy_log("%s: failed to parse arguments", label.c_str());
+		return;
+	}
+	
+	try {
+		const exceloutput::NpcData *excel_npc = &exceloutput::npc_datas.at(spawn_id);
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
 
@@ -1612,16 +1620,16 @@ void cmd_spawn(YSConnection *target, std::string label, std::string argline) {
 		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
 		entityinfo->mutable_abilityinfo()->set_isinited(false);
 		SceneNpcInfo *npcinfo = entityinfo->mutable_npc();
-		npcinfo->set_npcid(atoi(arg.c_str())); // npc
+		npcinfo->set_npcid(spawn_id); // npc
 
 		target->send_packet(&appear);
 
-		soggy_log("Spawned npc: %d", atoi(arg.c_str()));
+		soggy_log("Spawned npc: %d", spawn_id);
 		return;
     } catch (...) {
 	}  
 	try {
-		const exceloutput::MonsterData *excel_monster = &exceloutput::monster_datas.at(atoi(arg.c_str()));
+		const exceloutput::MonsterData *excel_monster = &exceloutput::monster_datas.at(spawn_id);
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
 
@@ -1634,16 +1642,16 @@ void cmd_spawn(YSConnection *target, std::string label, std::string argline) {
 		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
 		entityinfo->mutable_abilityinfo()->set_isinited(false);
 		SceneMonsterInfo *mobinfo = entityinfo->mutable_monster();
-		mobinfo->set_monsterid(atoi(arg.c_str())); // mob
+		mobinfo->set_monsterid(spawn_id); // mob
 
 		target->send_packet(&appear);
 
-		soggy_log("Spawned monster: %d", atoi(arg.c_str()));
+		soggy_log("Spawned monster: %d", spawn_id);
 		return;
 	} catch (...) {
 	}
 	try {
-		const exceloutput::GadgetData *excel_gadget = &exceloutput::gadget_datas.at(atoi(arg.c_str()));
+		const exceloutput::GadgetData *excel_gadget = &exceloutput::gadget_datas.at(spawn_id);
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
 
@@ -1656,11 +1664,11 @@ void cmd_spawn(YSConnection *target, std::string label, std::string argline) {
 		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
 		entityinfo->mutable_abilityinfo()->set_isinited(false);
 		SceneGadgetInfo *gadinfo = entityinfo->mutable_gadget();
-		gadinfo->set_gadgetid(atoi(arg.c_str())); // gad
+		gadinfo->set_gadgetid(spawn_id); // gad
 
 		target->send_packet(&appear);
 
-		soggy_log("Spawned gadget: %d", atoi(arg.c_str()));
+		soggy_log("Spawned gadget: %d", spawn_id);
 		return;
     } catch (...) {
         soggy_log("id not exist!");
