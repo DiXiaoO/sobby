@@ -1596,6 +1596,78 @@ void cmd_pos(YSConnection *target, std::string label, std::vector<std::string> a
 	soggy_log("rot x=%.3f y=%.3f z=%.3f", target->player->current_rot.x, target->player->current_rot.y, target->player->current_rot.z);
 }
 
+void cmd_spawn(YSConnection *target, std::string label, std::string argline) {
+	std::string arg = arg_take<std::string>(&argline);
+	try {
+		const exceloutput::NpcData *excel_npc = &exceloutput::npc_datas.at(atoi(arg.c_str()));
+		SceneEntityAppearNotify appear;
+		appear.set_appeartype(VisionType::VISION_MEET);
+
+		SceneEntityInfo *entityinfo = appear.add_entitylist();
+		entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_NPC);
+		entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::NPC_CATE));
+		pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+		entityinfo->mutable_motioninfo()->mutable_rot();
+		entityinfo->mutable_motioninfo()->mutable_speed();
+		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+		entityinfo->mutable_abilityinfo()->set_isinited(false);
+		SceneNpcInfo *npcinfo = entityinfo->mutable_npc();
+		npcinfo->set_npcid(atoi(arg.c_str())); // npc
+
+		target->send_packet(&appear);
+
+		soggy_log("Spawned npc: %d", atoi(arg.c_str()));
+		return;
+    } catch (...) {
+	}  
+	try {
+		const exceloutput::MonsterData *excel_monster = &exceloutput::monster_datas.at(atoi(arg.c_str()));
+		SceneEntityAppearNotify appear;
+		appear.set_appeartype(VisionType::VISION_MEET);
+
+		SceneEntityInfo *entityinfo = appear.add_entitylist();
+		entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_MONSTER);
+		entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::MONSTER_CATE));
+		pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+		entityinfo->mutable_motioninfo()->mutable_rot();
+		entityinfo->mutable_motioninfo()->mutable_speed();
+		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+		entityinfo->mutable_abilityinfo()->set_isinited(false);
+		SceneMonsterInfo *mobinfo = entityinfo->mutable_monster();
+		mobinfo->set_monsterid(atoi(arg.c_str())); // mob
+
+		target->send_packet(&appear);
+
+		soggy_log("Spawned monster: %d", atoi(arg.c_str()));
+		return;
+	} catch (...) {
+	}
+	try {
+		const exceloutput::GadgetData *excel_gadget = &exceloutput::gadget_datas.at(atoi(arg.c_str()));
+		SceneEntityAppearNotify appear;
+		appear.set_appeartype(VisionType::VISION_MEET);
+
+		SceneEntityInfo *entityinfo = appear.add_entitylist();
+		entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_GADGET);
+		entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::GADGET_CATE));
+		pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+		entityinfo->mutable_motioninfo()->mutable_rot();
+		entityinfo->mutable_motioninfo()->mutable_speed();
+		entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+		entityinfo->mutable_abilityinfo()->set_isinited(false);
+		SceneGadgetInfo *gadinfo = entityinfo->mutable_gadget();
+		gadinfo->set_gadgetid(atoi(arg.c_str())); // gad
+
+		target->send_packet(&appear);
+
+		soggy_log("Spawned gadget: %d", atoi(arg.c_str()));
+		return;
+    } catch (...) {
+        soggy_log("id not exist!");
+        return;
+    }
+}
+
 // todo commands:
 
 // packetlog on -> enable packet logging
@@ -1677,6 +1749,7 @@ void interactive_main() {
 	rlcmd_add_with_target("pos", cmd_pos);
 	rlcmd_add_with_target("warp", cmd_warp);
 	rlcmd_add_with_target("scene", cmd_scene);
+	rlcmd_add_with_target("spawn", cmd_spawn);
 
 	soggy_rx.install_window_change_handler();
 
