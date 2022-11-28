@@ -1676,6 +1676,93 @@ void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string>
     }
 }
 
+void cmd_npc_spawn(YSConnection *target, std::string label, std::vector<std::string> args) {
+	int npc_id;
+	
+	try {
+		parse_args(args, &npc_id);
+	} catch (std::exception &) {
+		soggy_log("%s: failed to parse arguments", label.c_str());
+		return;
+	}
+	
+	SceneEntityAppearNotify appear;
+	appear.set_appeartype(VisionType::VISION_MEET);
+
+	SceneEntityInfo *entityinfo = appear.add_entitylist();
+	entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_NPC);
+	entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::NPC_CATE));
+	pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+	entityinfo->mutable_motioninfo()->mutable_rot();
+	entityinfo->mutable_motioninfo()->mutable_speed();
+	entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+	entityinfo->mutable_abilityinfo()->set_isinited(false);
+	SceneNpcInfo *npcinfo = entityinfo->mutable_npc();
+	npcinfo->set_npcid(npc_id); // npc
+
+	target->send_packet(&appear);
+
+	soggy_log("Spawned npc: %d", npc_id);
+}
+
+void cmd_mob_spawn(YSConnection *target, std::string label, std::vector<std::string> args) {
+	int mob_id;
+	
+	try {
+		parse_args(args, &mob_id);
+	} catch (std::exception &) {
+		soggy_log("%s: failed to parse arguments", label.c_str());
+		return;
+	}
+
+	SceneEntityAppearNotify appear;
+	appear.set_appeartype(VisionType::VISION_MEET);
+
+	SceneEntityInfo *entityinfo = appear.add_entitylist();
+	entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_MONSTER);
+	entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::MONSTER_CATE));
+	pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+	entityinfo->mutable_motioninfo()->mutable_rot();
+	entityinfo->mutable_motioninfo()->mutable_speed();
+	entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+	entityinfo->mutable_abilityinfo()->set_isinited(false);
+	SceneMonsterInfo *mobinfo = entityinfo->mutable_monster();
+	mobinfo->set_monsterid(mob_id); // mob
+
+	target->send_packet(&appear);
+
+	soggy_log("Spawned monster: %d", mob_id);
+}
+
+void cmd_gad_spawn(YSConnection *target, std::string label, std::vector<std::string> args) {
+	int gad_id;
+	
+	try {
+		parse_args(args, &gad_id);
+	} catch (std::exception &) {
+		soggy_log("%s: failed to parse arguments", label.c_str());
+		return;
+	}
+	
+	SceneEntityAppearNotify appear;
+	appear.set_appeartype(VisionType::VISION_MEET);
+
+	SceneEntityInfo *entityinfo = appear.add_entitylist();
+	entityinfo->set_entitytype(ProtEntityType::PROT_ENTITY_GADGET);
+	entityinfo->set_entityid(get_new_entity_id(RuntimeIDCategory::GADGET_CATE));
+	pb_make_vector(entityinfo->mutable_motioninfo()->mutable_pos(), &target->player->current_pos);
+	entityinfo->mutable_motioninfo()->mutable_rot();
+	entityinfo->mutable_motioninfo()->mutable_speed();
+	entityinfo->set_lifestate(LifeState::LIFE_ALIVE);
+	entityinfo->mutable_abilityinfo()->set_isinited(false);
+	SceneGadgetInfo *gadinfo = entityinfo->mutable_gadget();
+	gadinfo->set_gadgetid(gad_id); // gad
+
+	target->send_packet(&appear);
+
+	soggy_log("Spawned gadget: %d", gad_id);
+}
+
 // todo commands:
 
 // packetlog on -> enable packet logging
@@ -1758,6 +1845,9 @@ void interactive_main() {
 	rlcmd_add_with_target("warp", cmd_warp);
 	rlcmd_add_with_target("scene", cmd_scene);
 	rlcmd_add_with_target("spawn", cmd_spawn);
+	rlcmd_add_with_target("snpc", cmd_npc_spawn);
+	rlcmd_add_with_target("smob", cmd_mob_spawn);
+	rlcmd_add_with_target("sgad", cmd_gad_spawn);
 
 	soggy_rx.install_window_change_handler();
 
@@ -1851,3 +1941,4 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
+
