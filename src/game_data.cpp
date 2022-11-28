@@ -41,6 +41,11 @@ namespace exceloutput {
 	std::unordered_map<int, ShopGoodsData> shop_goods_datas;
 	std::unordered_map<int, TalentSkillData> talent_skill_datas;
 	std::unordered_map<int, GadgetData> gadget_datas;
+	std::unordered_map<int, GadgetData_Level> gadget_level_datas;
+	std::unordered_map<int, GadgetData_Monster> gadget_monster_datas;
+	std::unordered_map<int, GadgetData_Avatar> gadget_avatar_datas;
+	std::unordered_map<int, GadgetData_Equip> gadget_equip_datas;
+	std::unordered_map<int, GadgetPropData> gadget_prop_datas;
 	std::unordered_map<int, MonsterData> monster_datas;
 	std::unordered_map<int, NpcData> npc_datas;
 
@@ -335,6 +340,34 @@ bool load_game_data() {
 	load_excel<exceloutput::GadgetData>("resources/exceloutput/GadgetData.tsv", &exceloutput::gadget_datas, "ID", [](exceloutput::GadgetData *gadget, Excel *excel) {
 		gadget->default_camp = excel->get_int("默认阵营");
 		gadget->is_interactive = (bool)excel->get_int("能否交互");
+	});
+	
+	// GadgetData_Level
+	load_excel<exceloutput::GadgetData_Level>("resources/exceloutput/GadgetData_Level.tsv", &exceloutput::gadget_level_datas, "ID", [](exceloutput::GadgetData_Level *gadget_level, Excel *excel) {
+		gadget_level->default_camp = excel->get_int("默认阵营");
+		gadget_level->is_interactive = (bool)excel->get_int("能否交互");
+	});
+	
+	// GadgetData_Monster
+	load_excel<exceloutput::GadgetData_Monster>("resources/exceloutput/GadgetData_Monster.tsv", &exceloutput::gadget_monster_datas, "ID", [](exceloutput::GadgetData_Monster *gadget_monster, Excel *excel) {
+		gadget_monster->default_camp = excel->get_int("默认阵营");
+		gadget_monster->is_interactive = (bool)excel->get_int("能否交互");
+	});
+	
+	// GadgetData_Avatar
+	load_excel<exceloutput::GadgetData_Avatar>("resources/exceloutput/GadgetData_Avatar.tsv", &exceloutput::gadget_avatar_datas, "ID", [](exceloutput::GadgetData_Avatar *gadget_avatar, Excel *excel) {
+		gadget_avatar->default_camp = excel->get_int("默认阵营");
+		gadget_avatar->is_interactive = (bool)excel->get_int("能否交互");
+	});
+	
+	// GadgetData_Equip
+	load_excel<exceloutput::GadgetData_Equip>("resources/exceloutput/GadgetData_Equip.tsv", &exceloutput::gadget_equip_datas, "ID", [](exceloutput::GadgetData_Equip *gadget_equip, Excel *excel) {
+		gadget_equip->default_camp = excel->get_int("默认阵营");
+		gadget_equip->is_interactive = (bool)excel->get_int("能否交互");
+	});
+	
+	// GadgetPropData
+	load_excel<exceloutput::GadgetPropData>("resources/exceloutput/GadgetPropData.tsv", &exceloutput::gadget_prop_datas, "ID", [](exceloutput::GadgetPropData *gadgetprop, Excel *excel) {
 	});
 
 	// MonsterData

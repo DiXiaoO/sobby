@@ -1598,6 +1598,7 @@ void cmd_pos(YSConnection *target, std::string label, std::vector<std::string> a
 
 void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string> args) {
 	int spawn_id;
+	int what = 0;
 	
 	try {
 		parse_args(args, &spawn_id);
@@ -1608,6 +1609,71 @@ void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string>
 	
 	try {
 		const exceloutput::NpcData *excel_npc = &exceloutput::npc_datas.at(spawn_id);
+		what = 1;
+	} catch (...) {
+	}  
+	
+	if (what == 0){
+		try {
+			const exceloutput::MonsterData *excel_monster = &exceloutput::monster_datas.at(spawn_id);
+			what = 2;
+		} catch (...) {
+		}  
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetData *excel_gadget = &exceloutput::gadget_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+		} 
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetData_Level *excel_gadget = &exceloutput::gadget_level_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+		} 
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetData_Monster *excel_gadget = &exceloutput::gadget_monster_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+		} 
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetData_Avatar *excel_gadget = &exceloutput::gadget_avatar_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+		} 
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetData_Equip *excel_gadget = &exceloutput::gadget_equip_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+		} 
+	}
+	
+	if (what == 0){
+		try {
+			const exceloutput::GadgetPropData *excel_gadget = &exceloutput::gadget_prop_datas.at(spawn_id);
+			what = 3;
+		} catch (...) {
+			soggy_log("id not exist!");
+			return;
+		} 
+	}
+	
+	
+	
+	if (what == 1){
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
 
@@ -1626,9 +1692,8 @@ void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string>
 
 		soggy_log("Spawned npc: %d", spawn_id);
 		return;
-    } catch (...) {
-	}  
-	try {
+	}
+	if (what == 2){
 		const exceloutput::MonsterData *excel_monster = &exceloutput::monster_datas.at(spawn_id);
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
@@ -1648,9 +1713,8 @@ void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string>
 
 		soggy_log("Spawned monster: %d", spawn_id);
 		return;
-	} catch (...) {
 	}
-	try {
+	if (what == 3){
 		const exceloutput::GadgetData *excel_gadget = &exceloutput::gadget_datas.at(spawn_id);
 		SceneEntityAppearNotify appear;
 		appear.set_appeartype(VisionType::VISION_MEET);
@@ -1670,9 +1734,6 @@ void cmd_spawn(YSConnection *target, std::string label, std::vector<std::string>
 
 		soggy_log("Spawned gadget: %d", spawn_id);
 		return;
-    } catch (...) {
-        soggy_log("id not exist!");
-        return;
     }
 }
 
@@ -1941,4 +2002,3 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
-
